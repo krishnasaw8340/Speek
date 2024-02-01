@@ -1,6 +1,9 @@
 import warnings
 import pyttsx3
 import speech_recognition as sr
+from gtts import gTTS
+import playsound
+import os
 
 # Suppress warnings
 warnings.filterwarnings('ignore')
@@ -35,4 +38,10 @@ def rec_audio():
     return data
 # Call the rec_audio function
 result = rec_audio()
+
+
+def response(text):
+    print(text)
+
+
 
