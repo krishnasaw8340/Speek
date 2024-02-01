@@ -1,47 +1,82 @@
 import warnings
-import pyttsx3
 import speech_recognition as sr
-from gtts import gTTS
-import playsound
+import pyttsx3
 import os
+import datetime
+import calendar
+import wikipedia
 
 # Suppress warnings
 warnings.filterwarnings('ignore')
 
-# Initialize the text-to-speech engine
-engine = pyttsx3.init()
+def rec_audio():
+    recognizer = sr.Recognizer()
 
-# Set the voice to a female voice (you can adjust this based on available voices)
-voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[1].id)  # 1 for female
+    with sr.Microphone() as source:
+        print("Listening for commands...")
+        recognizer.adjust_for_ambient_noise(source)
+        audio = recognizer.listen(source)
 
-# Function to speak text
-def talk(audio):
-    engine.say(audio)
+    try:
+        command = recognizer.recognize_google(audio)
+        print("You said:", command)
+        return command.lower()
+    except sr.UnknownValueError:
+        print("Could not understand audio. Please try again.")
+        return None
+    except sr.RequestError:
+        print("Unable to access the Google Speech Recognition API.")
+        return None
+
+def response_to_query(query):
+    now = datetime.datetime.now()
+
+    if "date" in query:
+        response_text = f"Today is {now.strftime('%A, %B %d, %Y')}."
+    elif "time" in query:
+        response_text = f"It is {now.strftime('%I:%M %p')}."
+    elif "month" in query:
+        response_text = f"We are in the month of {now.strftime('%B')}."
+    elif "wikipedia" in query:
+        if "who is" in query:
+            person = wiki_person(query)
+            wiki_summary = wikipedia.summary(person, sentences=2)
+            response_text = f"{person} is {wiki_summary}"
+        else:
+            response_text = "I'm sorry, I didn't understand that Wikipedia query."
+    elif "thank you" in query:
+        response_text = "You're welcome! Exiting the program."
+        exit()
+    else:
+        response_text = "I'm sorry, I didn't understand that query."
+
+    return response_text
+
+def wiki_person(text):
+    list_wiki = text.split()
+    for i in range(0, len(list_wiki)):
+        if i + 3 <= len(list_wiki) - 1 and list_wiki[i].lower() == "who" and list_wiki[i + 1].lower() == "is":
+            return list_wiki[i + 2] + " " + list_wiki[i + 3]
+
+def response(response_text):
+    print(response_text)
+    engine = pyttsx3.init()
+    # Set the voice to a female voice
+    voices = engine.getProperty('voices')
+    engine.setProperty('voice', voices[1].id)  # 1 for female
+    engine.say(response_text)
     engine.runAndWait()
 
-# Function to perform speech recognition
-def rec_audio():
-    recog = sr.Recognizer()
-    with sr.Microphone() as source:
-        print("Listening...")
-        audio = recog.listen(source)
-    data = " "
+# Main loop
+while True:
     try:
-        # Using Google Speech Recognition (as in the provided link)
-        data = recog.recognize_google(audio)
-        print("You said " + data)
-    except sr.RequestError as ex:
-        print("Request Error from Google Speech Recognition: " + str(ex))
-    except sr.UnknownValueError:
-        print("Google Speech Recognition could not understand audio")
-    return data
-# Call the rec_audio function
-result = rec_audio()
-
-
-def response(text):
-    print(text)
-
-
-
+        query = rec_audio()
+        if query:
+            response_text = response_to_query(query)
+            response(response_text)
+    except KeyboardInterrupt:
+        print("Exiting the program.")
+        break
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        response("I don't know that.")
