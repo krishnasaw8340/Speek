@@ -33,6 +33,14 @@ def response_to_query(query):
 
     if "date" in query:
         response_text = f"Today is {now.strftime('%A, %B %d, %Y')}."
+    elif any(word in query for word in ["hi", "hello"]):
+        response_text = "Hello there! How are you? By the way, I am great."
+    elif any(word in query.lower() for word in ["i am also fine", "i am fine"]):
+        response_text = "Great, buddy!"
+    elif any(word in query.lower() for word in ["Your name", " tell me your name", "your name"]):
+        response_text = "My name is Speek Assistant. thanks for asking !"
+    elif any(word in query for word in ["who are you","define yourself"]):
+        response_text = "Hello, I am the voice assistant of Krishna. I am here to make your life easier. You can command me to perform tasks like opening applications on the computer, writing emails, opening YouTube, etc."
     elif "time" in query:
         response_text = f"It is {now.strftime('%I:%M %p')}."
     elif "month" in query:
