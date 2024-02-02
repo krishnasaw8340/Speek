@@ -5,6 +5,10 @@ import os
 import datetime
 import calendar
 import wikipedia
+import webbrowser
+
+import pyjokes
+import subprocess
 
 # Suppress warnings
 warnings.filterwarnings('ignore')
@@ -27,6 +31,22 @@ def rec_audio():
     except sr.RequestError:
         print("Unable to access the Google Speech Recognition API.")
         return None
+def wiki_person(text):
+    list_wiki = text.split()
+    for i in range(0, len(list_wiki)):
+        if i + 3 <= len(list_wiki) - 1 and list_wiki[i].lower() == "who" and list_wiki[i + 1].lower() == "is":
+            return list_wiki[i + 2] + " " + list_wiki[i + 3]
+
+def response(response_text):
+    print(response_text)
+    engine = pyttsx3.init()
+    # Set the voice to a female voice
+    voices = engine.getProperty('voices')
+    engine.setProperty('voice', voices[1].id)  # 1 for female
+    engine.say(response_text)
+    engine.runAndWait()
+
+
 
 def response_to_query(query):
     now = datetime.datetime.now()
@@ -45,6 +65,36 @@ def response_to_query(query):
         response_text = f"It is {now.strftime('%I:%M %p')}."
     elif "month" in query:
         response_text = f"We are in the month of {now.strftime('%B')}."
+    elif "open" in query.lower():
+        if "chrome" in query.lower():
+            response_text = f"Opening Google Chrome...."
+            os.startfile(
+                r"C:\Program Files\Google\Chrome\Application\chrome.exe"
+            )
+        elif "vs code" in query.lower():
+            response_text = f"Opening VS code...."
+            os.startfile((
+                r'C:\Users\Nandan PC\AppData\Local\Programs\Microsoft VS Code\Code.exe'
+            ))
+        elif "youtube" in query.lower():
+            ind = query.lower().split().index("youtube")
+            search = query.split()[ind + 1:]
+            search_query = "+".join(search)
+            webbrowser.open("https://www.youtube.com/results?search_query=" + search_query)
+            response_text = f"Opening {search_query} on Youtube"
+
+        elif "search" in query.lower():
+            ind = query.lower().split().index("search")
+            search = query.split()[ind +1:]
+            webbrowser.open("https://google.com/search?q="+"+".join(search))
+            response_text = f"Searching " +str(search) + "on google"
+        elif "google" in query.lower():
+            response_text = f"Opening Google..."
+            webbrowser.open("https://google.com")
+
+        else:
+            response_text = f"Application Not found !"
+
     elif "wikipedia" in query:
         if "who is" in query:
             person = wiki_person(query)
@@ -60,20 +110,6 @@ def response_to_query(query):
 
     return response_text
 
-def wiki_person(text):
-    list_wiki = text.split()
-    for i in range(0, len(list_wiki)):
-        if i + 3 <= len(list_wiki) - 1 and list_wiki[i].lower() == "who" and list_wiki[i + 1].lower() == "is":
-            return list_wiki[i + 2] + " " + list_wiki[i + 3]
-
-def response(response_text):
-    print(response_text)
-    engine = pyttsx3.init()
-    # Set the voice to a female voice
-    voices = engine.getProperty('voices')
-    engine.setProperty('voice', voices[1].id)  # 1 for female
-    engine.say(response_text)
-    engine.runAndWait()
 
 # Main loop
 while True:
