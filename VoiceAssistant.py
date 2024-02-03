@@ -8,8 +8,8 @@ import wikipedia
 import webbrowser
 import pyjokes
 import subprocess
-import smtplib
-
+import requests
+import json
 # Suppress warnings
 warnings.filterwarnings('ignore')
 
@@ -124,6 +124,29 @@ def response_to_query(query):
         response_text="This is where" + str(location) + "is"
         # response(response_text)
         webbrowser.open(url)
+    elif "weather" in query:
+        key = "19b99ad811adc54b48634240f3503076"
+        weather_url = "https://api.openweathermap.org/data/2.5/weather?"
+        ind = query.split().index("in")
+        location = query.split()[ind + 1:]
+        location = "".join(location)
+        url = weather_url + "q=" + location + "&appid=" + key + "&units=metric"
+        js = requests.get(url).json()
+        if js["cod"] != "404":
+            weather_main = js["weather"][0]["main"]
+            temperature = js["main"]["temp"]
+            humidity = js["main"]["humidity"]
+            description = js["weather"][0]["description"]
+            cloudiness = js["clouds"]["all"]
+            wind_speed = js["wind"]["speed"]
+
+            weather_response = f"The weather in {location} is {description}."
+            weather_response += f"\nTemperature: {temperature}°C | Humidity: {humidity}%"
+            weather_response += f"\nCloudiness: {cloudiness}% | Wind Speed: {wind_speed} m/s"
+
+            response_text = weather_response
+        else:
+            response_text = "City not found"
 
     elif any(word in query.lower() for word in ["thank you", "thanks", "thank", "bye"]):
         response_text = "Have a great day ...See you buddy!"
