@@ -56,6 +56,48 @@ def note(text):
         f.write(text)
     subprocess.Popen(["notepad.exe", file_name])
 
+# Replace 'YOUR_APP_ID' with your actual Wolfram Alpha app ID
+app_id = '3J4KK6-E4PQG4V7V2'
+
+# Base URL for the Conversational API
+base_url = 'http://api.wolframalpha.com/v1/conversation.jsp'
+
+def make_wolfram_alpha_query(query, conversation_id=None, s=None):
+    # Prepare query parameters
+    params = {
+        'appid': app_id,
+        'i': query,
+    }
+
+    # Add optional parameters if available
+    if conversation_id:
+        params['conversationid'] = conversation_id
+    if s:
+        params['s'] = s
+
+    # Make the HTTP request
+    response = requests.get(base_url, params=params)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        # Parse the JSON response
+        result = response.json()
+
+        # Check for errors
+        if 'error' in result:
+            print(f"Error: {result['error']}")
+            return None
+        else:
+            # Extract relevant information from the response
+            conversation_id = result.get('conversationID')
+            host = result.get('host')
+            spoken_text = result.get('result')
+
+            return conversation_id, host, spoken_text
+    else:
+        print(f"Error: HTTP status code {response.status_code}")
+        return None
+
 
 def response_to_query(query):
     now = datetime.datetime.now()
@@ -200,14 +242,12 @@ def response_to_query(query):
         res = client.query(" ".join(text))
         answer = next(res.results).text
         response_text = "The Answer is " + answer
-    elif "which is" in query.lower() or "how is" in query.lower():
-        app_id = "3J4KK6-E4PQG4V7V2"
-        client = wolframalpha.Client(app_id)
-        ind = query.lower().split().index("is")
-        text = query.split()[ind + 1:]
-        res = client.query(" ".join(text))
-        answer = next(res.results).text
-        response_text = "The Answer is " + answer
+    elif "tell me" in query.lower() or "explain" in query.lower():
+        response("Ask the Query")
+        query1 = rec_audio()
+        conversation_id, host, response_text1 = make_wolfram_alpha_query(query1)
+        # Print the result of the single query
+        response_text = f"Response 1: {response_text1}"
 
     elif any(word in query.lower() for word in ["thank you", "thanks", "thank", "bye"]):
         response_text = "Have a great day ...See you buddy!"
