@@ -10,6 +10,9 @@ import pyjokes
 import subprocess
 import requests
 import json
+
+from pyttsx3 import engine
+
 # Suppress warnings
 warnings.filterwarnings('ignore')
 
@@ -147,6 +150,39 @@ def response_to_query(query):
             response_text = weather_response
         else:
             response_text = "City not found"
+    elif "news" in query:
+        api_key = "171b0706669c49deab91dce3c848a65b"
+        url = ('https://newsapi.org/v2/top-headlines?'
+               'country=in&'
+               f'apiKey={api_key}')
+        try:
+            response_data = requests.get(url)
+            response_data.raise_for_status()  # Raise an HTTPError for bad responses
+
+            news = response_data.json()
+
+            if 'articles' in news:
+                counter = 0  # Counter for tracking the number of news articles printed
+
+                for new in news["articles"]:
+                    title = str(new.get("title", ""))
+                    description = str(new.get("description", ""))
+
+                    print(title, "\n")
+                    response(title)
+
+                    print(description, "\n")
+                    response(description)
+
+                    counter += 1
+                    if counter == 5:
+                        break  # Break out of the loop after printing the first 5 articles
+            else:
+                print("Unexpected news API response format.")
+                response_text = "Sorry, I couldn't fetch the latest news at the moment."
+        except Exception as e:
+            print(f"An error occurred while fetching news: {e}")
+            response_text = "Sorry, I couldn't fetch the latest news at the moment."
 
     elif any(word in query.lower() for word in ["thank you", "thanks", "thank", "bye"]):
         response_text = "Have a great day ...See you buddy!"
