@@ -2,16 +2,16 @@ import warnings
 import speech_recognition as sr
 import pyttsx3
 import os
-import datetime
-import calendar
 import wikipedia
 import webbrowser
 import pyjokes
 import subprocess
 import requests
-import json
 
-from pyttsx3 import engine
+import datetime
+import os.path
+import wolframalpha
+
 
 # Suppress warnings
 warnings.filterwarnings('ignore')
@@ -183,6 +183,31 @@ def response_to_query(query):
         except Exception as e:
             print(f"An error occurred while fetching news: {e}")
             response_text = "Sorry, I couldn't fetch the latest news at the moment."
+    elif "calculate" in query.lower():
+        app_id="3J4KK6-E4PQG4V7V2"
+        client = wolframalpha.Client(app_id)
+        ind = query.lower().split().index("calculate")
+        text = query.split()[ind +1:]
+        res = client.query(" ".join(text))
+        answer = next(res.results).text
+        response_text = "The Answer is "+answer
+        response(response_text)
+    elif "what is " in query.lower() or "who is" in query.lower():
+        app_id = "3J4KK6-E4PQG4V7V2"
+        client = wolframalpha.Client(app_id)
+        ind = query.lower().split().index("is")
+        text = query.split()[ind + 1:]
+        res = client.query(" ".join(text))
+        answer = next(res.results).text
+        response_text = "The Answer is " + answer
+    elif "which is" in query.lower() or "how is" in query.lower():
+        app_id = "3J4KK6-E4PQG4V7V2"
+        client = wolframalpha.Client(app_id)
+        ind = query.lower().split().index("is")
+        text = query.split()[ind + 1:]
+        res = client.query(" ".join(text))
+        answer = next(res.results).text
+        response_text = "The Answer is " + answer
 
     elif any(word in query.lower() for word in ["thank you", "thanks", "thank", "bye"]):
         response_text = "Have a great day ...See you buddy!"
