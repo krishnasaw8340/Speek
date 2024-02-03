@@ -6,9 +6,9 @@ import datetime
 import calendar
 import wikipedia
 import webbrowser
-
 import pyjokes
 import subprocess
+import smtplib
 
 # Suppress warnings
 warnings.filterwarnings('ignore')
@@ -46,6 +46,12 @@ def response(response_text):
     engine.say(response_text)
     engine.runAndWait()
 
+def note(text):
+    date = datetime.datetime.now()
+    file_name = str(date).replace(":","-")+ "note.txt"
+    with open(file_name, "w") as f:
+        f.write(text)
+    subprocess.Popen(["notepad.exe", file_name])
 
 
 def response_to_query(query):
@@ -94,6 +100,15 @@ def response_to_query(query):
 
         else:
             response_text = f"Application Not found !"
+    elif "note" in query or "write a note" in query.lower():
+        response_text= "What would you like me to write down?"
+        response(response_text)
+        note_text = rec_audio()
+        note(note_text)
+        response_text = "I have a made a note of that"
+    elif "joke" in query or "jokes" in query:
+        joke = pyjokes.get_joke()
+        response_text = joke
 
     elif "wikipedia" in query:
         if "who is" in query:
@@ -102,8 +117,17 @@ def response_to_query(query):
             response_text = f"{person} is {wiki_summary}"
         else:
             response_text = "I'm sorry, I didn't understand that Wikipedia query."
-    elif "thank you" in query:
-        response_text = "You're welcome! Exiting the program."
+    elif "where is" in query.lower():
+        ind = query.lower().split().index("is")
+        location = query.split()[ind+1:]
+        url = "https://www.google.com/maps/place/"+"".join(location)
+        response_text="This is where" + str(location) + "is"
+        # response(response_text)
+        webbrowser.open(url)
+
+    elif any(word in query.lower() for word in ["thank you", "thanks", "thank", "bye"]):
+        response_text = "Have a great day ...See you buddy!"
+        response(response_text)
         exit()
     else:
         response_text = "I'm sorry, I didn't understand that query."
