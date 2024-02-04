@@ -7,7 +7,6 @@ import webbrowser
 import pyjokes
 import subprocess
 import requests
-
 import datetime
 import os.path
 import wolframalpha
@@ -247,7 +246,7 @@ def response_to_query(query):
         query1 = rec_audio()
         conversation_id, host, response_text1 = make_wolfram_alpha_query(query1)
         # Print the result of the single query
-        response_text = f"Response 1: {response_text1}"
+        response_text = f"{response_text1}"
 
     elif any(word in query.lower() for word in ["thank you", "thanks", "thank", "bye"]):
         response_text = "Have a great day ...See you buddy!"
