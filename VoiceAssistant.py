@@ -10,6 +10,8 @@ import requests
 import datetime
 import os.path
 import wolframalpha
+from selenium import webdriver
+from time import sleep
 
 
 # Suppress warnings
