@@ -18,11 +18,13 @@ def pizza():
     driver = setup_webdriver()
 
     try:
+        response("Opening Dominos")
         driver.get("https://www.dominos.co.in/")
         driver.maximize_window()
         sleep(2)
 
         # Correcting the way to find the "ORDER ONLINE NOW" link
+        response("Ordering Online")
         order_online_link = driver.find_element(By.LINK_TEXT, "ORDER ONLINE NOW")
         order_online_link.click()
         sleep(2)
@@ -31,6 +33,7 @@ def pizza():
         location_input = driver.find_element(By.CLASS_NAME, "srch-cnt-srch-inpt")  # Replace with the actual class name
         location_input.click()
 
+        response("Gathering your Location")
         location = ("Kelambakkam - Vandalur Road, Kelambakkam")
 
         location_input.send_keys(location)  # Send text to location search input field
@@ -44,7 +47,10 @@ def pizza():
         sleep(2)
 
         # Rest of your code...
-        phone_num = "6201872014"
+        phone_num = "6201862014"
+        # Rest of your code...
+        response("Your Phone number is " + phone_num)
+
         try:
             driver.find_element(By.CLASS_NAME, "prf-grp-txt").click()
             driver.find_element(By.XPATH,

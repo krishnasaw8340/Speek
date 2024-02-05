@@ -234,7 +234,6 @@ def response_to_query(query):
         res = client.query(" ".join(text))
         answer = next(res.results).text
         response_text = "The Answer is "+answer
-        response(response_text)
     elif "what is " in query.lower() or "who is" in query.lower():
         app_id = "3J4KK6-E4PQG4V7V2"
         client = wolframalpha.Client(app_id)
