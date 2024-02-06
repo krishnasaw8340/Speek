@@ -34,7 +34,7 @@ def pizza():
         location_input.click()
 
         response("Gathering your Location")
-        location = ("Kelambakkam - Vandalur Road, Kelambakkam")
+        location = ("Kelambakkam-Vandalur Road, Kelambakkam")
 
         location_input.send_keys(location)  # Send text to location search input field
         sleep(2)
